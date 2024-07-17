@@ -6,7 +6,7 @@ const { type } = require('os');
 const ModuleSchema = new mongoose.Schema({
     name: { type: String, required: true },
     description: { type: String },
-    subject: { type: string},
+    subject: { type: String},
     lectures: [{
         index: { type: Number },
         lectureid: { type: String }
