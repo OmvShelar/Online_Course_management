@@ -132,6 +132,26 @@ async function assignCourse(req, res) {
     }
 }
 
+async function getAssignedCourse(req, res) {
+    try {
+        const userid = req.params.id;
+        const user = await User.findOne({ _id: userid }).populate('course');
+
+        if (!user) {
+            return res.status(404).send({ message: "Unknown userId" });
+        }
+
+        if (!user.course || user.course.length === 0) {
+            return res.status(404).send({ message: "No course assigned to this user" });
+        }
+
+        return res.status(200).send(user.course);
+
+    } catch (error) {
+        return res.status(500).send(error);
+    }
+}
+
 async function deleteusercourse(req,res){
 const userId = req.params.id;
 const courseId = req.body.courseId;
@@ -191,5 +211,6 @@ module.exports ={
         updateuser,
         assignCourse,
         deleteusercourse,
-        updateCourse
+        updateCourse,
+        getAssignedCourse
     }

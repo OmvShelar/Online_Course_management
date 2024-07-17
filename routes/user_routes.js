@@ -19,7 +19,8 @@ router.post('/login',userController.loginStudent);
 
 router.delete('/:id/deletecourse',userController.deleteusercourse);
 
-router.delete('/:id/updateCourse',userController.updateCourse);
+router.put('/:id/updateCourse',userController.updateCourse);
 
+router.get('/:id/updateCourse',userController.getAssignedCourse);
 
 module.exports = router;
