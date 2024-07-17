@@ -18,7 +18,7 @@ app.use('/user', userRoutes);
 app.use('/course', courseRoutes);
 
 
-app.listen(8001,()=>{
+app.listen(4001,()=>{
     console.log("Server Started");
 })
 

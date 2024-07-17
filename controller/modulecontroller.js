@@ -58,65 +58,107 @@ async function updateModule(req, res) {
     }
 }
 
-async function assign(req, res) {
+async function assignLecture(req, res) {
     try {
         const userid = req.params.id;
         const user = await User.findOne({ _id: userid });
 
         if (!user) {
-            res.status(404).send({ message: "Unknown userId" });
-        } else {
-
-            const course = await Course.findById(req.body.courseId);
-            console.log(course);
-            if (!course) {
-                res.status(404).send({ message: "Unknown courseId" });
-            } else {
-                const courses = [req.body.courseId];
-
-                user.course = courses;
-
-                const updateUser = await user.save();
-                if (updateUser) {
-                    res.status(200).send(updateUser);
-                }
-            }
-
+            return res.status(404).send({ message: "Unknown userId" });
         }
 
+        const lecture = await Lecture.findById(req.body.lectureId);
+        if (!lecture) {
+            return res.status(404).send({ message: "Unknown lectureId" });
+        }
+
+        const lectures = [req.body.lectureId];
+
+        user.lectures = lectures;
+
+        const updatedUser = await user.save();
+        return res.status(200).send(updatedUser);
+
     } catch (error) {
-        res.status(500).send(error);
+        return res.status(500).send(error);
     }
 }
 
-async function deleteusercourse(req,res){
-const userId = req.params.id;
-const courseId = req.body.courseId;
-try {
-    const user = await User.findOne({_id: userId});
-    console.log(user);
+async function getAssignedLectures(req, res) {
+    try {
+        const userid = req.params.id;
+        const user = await User.findOne({ _id: userid }).populate('lectures');
 
-    const usercourse = user.course;
+        if (!user) {
+            return res.status(404).send({ message: "Unknown userId" });
+        }
 
-    let newlist = await usercourse.filter(c =>{
-        return c != courseId;
-    });
+        if (!user.lectures || user.lectures.length === 0) {
+            return res.status(404).send({ message: "No lectures assigned to this user" });
+        }
 
-    console.log(newlist);
+        return res.status(200).send(user.lectures);
 
-    user.course = newlist;
-        
-    const updatedUser = await user.save();
- 
-    res.status(200).send(updatedUser);
-} catch (error) {
-    res.status(500).send(error);
+    } catch (error) {
+        return res.status(500).send(error);
+    }
 }
+
+async function deleteUserLecture(req, res) {
+    const userId = req.params.id;
+    const lectureId = req.body.lectureId;
+    try {
+        const user = await User.findOne({ _id: userId });
+        if (!user) {
+            return res.status(404).send({ message: "Unknown userId" });
+        }
+
+        user.lectures = user.lectures.filter(l => l != lectureId);
+
+        const updatedUser = await user.save();
+        return res.status(200).send(updatedUser);
+
+    } catch (error) {
+        return res.status(500).send(error);
+    }
 }
+
+
+async function updateLecture(req, res) {
+    const userId = req.params.id;
+    const lectureId = req.body.lectureId;
+    const newLectureId = req.body.newLectureId;
+    try {
+        const user = await User.findOne({ _id: userId });
+        if (!user) {
+            return res.status(404).send({ message: "Unknown userId" });
+        }
+
+        const lectureIndex = user.lectures.indexOf(lectureId);
+        if (lectureIndex === -1) {
+            return res.status(404).send({ message: "Lecture not found for the user" });
+        }
+
+        user.lectures[lectureIndex] = newLectureId;
+
+        const updatedUser = await user.save();
+        return res.status(200).send({ message: "Lecture updated", updatedUser });
+
+    } catch (error) {
+        return res.status(500).send(error);
+    }
+}
+
+
+
 
 module.exports = {
     addModule,
     getModule,
     deleteModule,
-    updateModule
+    updateModule,
+    assignLecture,
+    deleteUserLecture,
+    updateLecture,
+    getAssignedLectures
 }

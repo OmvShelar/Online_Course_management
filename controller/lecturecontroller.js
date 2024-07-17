@@ -12,7 +12,18 @@ async function addLecture(req, res) {
     } catch (error) {
         res.status(500).send(error);
     } 
-}  
+}
+
+function checkTeacherRole(req, res, next) {
+    const userRole = req.user.role; 
+
+    if (userRole !== 'TEACHER') {
+        return res.status(403).send({ message: "Access denied. Only teachers can perform this action." });
+    }
+
+    next();
+}
+
 async function getLecture(req, res) {
     console.log("**------**")
     try {

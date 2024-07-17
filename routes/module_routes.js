@@ -3,18 +3,22 @@ const express = require ('express');
 const ModuleController = require('../controller/modulecontroller')
 // const authorise = require('../middleware/authorise')
 
-const courserouter = express.Router();
+const modulerouter = express.Router();
 
-modulerouter.post('/addmodule',ModuleController.addCourse);
+modulerouter.post('/addmodule',ModuleController.addModule);
 
-modulerouter.get('/getmodule',ModuleController.getcourse);
+modulerouter.get('/getmodule',ModuleController.getModule);
 
-modulerouter.put('/updatemodule/:id',ModuleController.updatecourse);
+modulerouter.put('/updatemodule/:id',ModuleController.updateModule);
 
-modulerouter.delete('/deletemodule/:id',ModuleController.deletecourse);
+modulerouter.delete('/deletemodule/:id',ModuleController.deleteModule);
 
-// router.post('/register',userController.adduser);
+modulerouter.post('/:id/assignlecture',ModuleController.assignLecture);
 
-// router.post('/login',userController.loginStudent);
+modulerouter.get('/:id/getlecture',ModuleController.getAssignedLectures);
 
-module.exports = courserouter;
+modulerouter.delete('/:id/deletelecture',ModuleController.deleteUserLecture);
+
+modulerouter.put('/:id/updatelecture', ModuleController.updateLecture);
+
+module.exports = modulerouter;

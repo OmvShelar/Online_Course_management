@@ -13,8 +13,12 @@ courserouter.put('/updateuser/:id',courseController.updatecourse);
 
 courserouter.delete('/deleteuser/:id',courseController.deletecourse);
 
-// router.post('/register',userController.adduser);
+courserouter.delete('/assignmodule',courseController.assignModule);
 
-// router.post('/login',userController.loginStudent);
+courserouter.delete('/deletemodule:id',courseController.deleteUserModule);
+
+courserouter.delete('/getmodule/:id',courseController.getAssignedModules);
+
+courserouter.delete('/updatetemodule/:id',courseController.updateModule);
 
 module.exports = courserouter;

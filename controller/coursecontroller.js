@@ -114,9 +114,103 @@ try {
 }
 }
 
+async function assignModule(req, res) {
+    try {
+        const userid = req.params.id;
+        const user = await User.findOne({ _id: userid });
+
+        if (!user) {
+            return res.status(404).send({ message: "Unknown userId" });
+        }
+
+        const module = await Module.findById(req.body.moduleId);
+        if (!module) {
+            return res.status(404).send({ message: "Unknown moduleId" });
+        }
+
+        const modules = [req.body.moduleId];
+
+        user.modules = modules;
+
+        const updatedUser = await user.save();
+        return res.status(200).send(updatedUser);
+
+    } catch (error) {
+        return res.status(500).send(error);
+    }
+}
+
+async function getAssignedModules(req, res) {
+    try {
+        const userid = req.params.id;
+        const user = await User.findOne({ _id: userid }).populate('modules');
+
+        if (!user) {
+            return res.status(404).send({ message: "Unknown userId" });
+        }
+
+        if (!user.modules || user.modules.length === 0) {
+            return res.status(404).send({ message: "No modules assigned to this user" });
+        }
+
+        return res.status(200).send(user.modules);
+
+    } catch (error) {
+        return res.status(500).send(error);
+    }
+}
+
+async function deleteUserModule(req, res) {
+    const userId = req.params.id;
+    const moduleId = req.body.moduleId;
+    try {
+        const user = await User.findOne({ _id: userId });
+        if (!user) {
+            return res.status(404).send({ message: "Unknown userId" });
+        }
+
+        user.modules = user.modules.filter(m => m != moduleId);
+
+        const updatedUser = await user.save();
+        return res.status(200).send(updatedUser);
+
+    } catch (error) {
+        return res.status(500).send(error);
+    }
+}
+
+async function updateModule(req, res) {
+    const userId = req.params.id;
+    const moduleId = req.body.moduleId;
+    const newModuleId = req.body.newModuleId;
+    try {
+        const user = await User.findOne({ _id: userId });
+        if (!user) {
+            return res.status(404).send({ message: "Unknown userId" });
+        }
+
+        const moduleIndex = user.modules.indexOf(moduleId);
+        if (moduleIndex === -1) {
+            return res.status(404).send({ message: "Module not found for the user" });
+        }
+
+        user.modules[moduleIndex] = newModuleId;
+
+        const updatedUser = await user.save();
+        return res.status(200).send({ message: "Module updated", updatedUser });
+
+    } catch (error) {
+        return res.status(500).send(error);
+    }
+}
+
 module.exports = {
     addCourse,
     getcourse,
     deletecourse,
-    updatecourse
+    updatecourse,
+    assignModule,
+    deleteUserModule,
+    getAssignedModules,
+    updateModule
 }
